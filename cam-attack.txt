@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Имя интерфейса
+INTERFACE="interface_name"
+
+# Проверка аргументов
+if [ "$#" -ne 2 ]; then
+    echo "Использование: $0 <IP-адрес> <количество запросов>"
+    exit 1
+fi
+
+IP=$1
+COUNT=$2
+
+# Счетчик пакетов
+PACKET_COUNT=0
+
+# Обработчик сигнала SIGINT (CTRL+C)
+trap 'echo -e "\nОтправлено пакетов: $PACKET_COUNT"' SIGINT
+
+# Выполняем заданное количество ping-запросов
+for i in $(seq 1 $COUNT)
+do
+    # Отключаем интерфейс
+    sudo ifconfig $INTERFACE down
+
+    # Изменяем MAC-адрес
+    sudo macchanger -r $INTERFACE
+
+    # Включаем интерфейс
+    sudo ifconfig $INTERFACE up
+
+    # Выполняем ping-запрос
+    ping -c 1 $IP
+
+    # Увеличиваем счетчик пакетов
+    PACKET_COUNT=$((PACKET_COUNT+1))
+done

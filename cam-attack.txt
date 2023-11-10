@@ -30,8 +30,8 @@ do
     # Включаем интерфейс
     sudo ifconfig $INTERFACE up
 
-    # Выполняем ping-запрос
-    ping -c 1 $IP
+    # Выполняем ping-запрос без ожидания ответа
+    ping -c 1 -W 0 $IP &> /dev/null &
 
     # Увеличиваем счетчик пакетов
     PACKET_COUNT=$((PACKET_COUNT+1))
